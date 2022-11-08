@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Lobby</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+</head>
+<body>
+    <h1>Lets chat!</h1>
+
+    <form id="form">
+        <input type="text" name="message"/>
+    </form>
+
+    <div id="messages"></div>
+
+    <script type="text/javascript">
+        let url = `wss://2dfb-163-53-177-63.in.ngrok.io/ws/socket-server/`
+
+            if (sessionStorage.name){
+                
+            }else{
+                let text;
+                let person = prompt("Please enter your name:", "Enter your name .");
+                if (person == null || person == "") {
+                    text = "User cancelled the prompt.";
+                } else {
+                    sessionStorage.name = person
+                }
+            }
+        
+
+        const chatSocket = new WebSocket(url)
+
+        chatSocket.onmessage = function(e){
+            let data = JSON.parse(e.data)
+            console.log('Data:', data)
+            if (sessionStorage.color){
+                
+            }else{
+                sessionStorage.color = Math.floor(100000 + Math.random() * 900000)
+            }
+            if(data.type === 'chat'){
+                let messages = document.getElementById('messages')
+
+                messages.insertAdjacentHTML('beforeend', `<div>
+                                        <p style='color:#${data.color}; font-weight: bold;'>${data.message}</p>
+                                    </div>`)
+            }
+        }
+
+        let form = document.getElementById('form')
+        form.addEventListener('submit', (e)=> {
+            e.preventDefault()
+            let message = e.target.message.value 
+            chatSocket.send(JSON.stringify({
+                'message':sessionStorage.name+" :: "+message,
+                'color':sessionStorage.color
+            }))
+            form.reset()
+        })
+
+    </script>
+</body>
+</html>
